@@ -1,29 +1,116 @@
-# MyCustomPod
+# BagistoNative_iOS
 
-[![CI Status](https://img.shields.io/travis/129182619/MyCustomPod.svg?style=flat)](https://travis-ci.org/129182619/MyCustomPod)
-[![Version](https://img.shields.io/cocoapods/v/MyCustomPod.svg?style=flat)](https://cocoapods.org/pods/MyCustomPod)
-[![License](https://img.shields.io/cocoapods/l/MyCustomPod.svg?style=flat)](https://cocoapods.org/pods/MyCustomPod)
-[![Platform](https://img.shields.io/cocoapods/p/MyCustomPod.svg?style=flat)](https://cocoapods.org/pods/MyCustomPod)
+**BagistoNative_iOS** provides production-ready **Hotwire Native iOS
+bridge components** that enable seamless communication between **Swift
+code and web views** in hybrid iOS applications.
 
-## Example
+Bridge components allow your app to break out of the web view container
+and drive **native iOS features** such as scanners, permissions,
+haptics, and more --- while still keeping the majority of your UI on the
+web.
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+This library contains reusable, real-world bridge components that can be
+easily plugged into any Hotwire Native iOS app.
 
-## Requirements
+------------------------------------------------------------------------
 
-## Installation
+## ✨ Features
 
-MyCustomPod is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+-   Native iOS bridge components for Hotwire Native
+-   Plug-and-play architecture
+-   Designed for production use
+-   Easy to extend and customize
+-   Swift Package Manager support
 
-```ruby
-pod 'MyCustomPod'
+------------------------------------------------------------------------
+
+## 📦 Components
+
+The following bridge components are included:
+
+-   Alert
+-   Barcode Scanner
+-   Biometrics Lock
+-   Button
+-   Document Scanner
+-   Form
+-   Haptic Feedback
+-   Location
+-   Menu
+-   Permissions
+-   Review Prompt
+-   Search
+-   Share
+-   Theme
+-   Toast
+
+------------------------------------------------------------------------
+
+## 📋 Requirements
+
+-   iOS 14.0+
+-   Swift 5.7+
+-   Hotwire Native iOS v1.2 or later
+
+------------------------------------------------------------------------
+
+## 🚀 Installation (Swift Package Manager)
+
+### Add the package dependency
+
+In Xcode:
+
+File → Add Package Dependencies...
+
+Repository URL:
+
+https://github.com/SocialMobikul/BagistoNative_iOS
+
+------------------------------------------------------------------------
+
+### Register bridge components
+
+``` swift
+import UIKit
+import HotwireNative
+import BagistoNative_iOS
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+
+        Hotwire.registerBridgeComponents(BagistoNative.coreComponents)
+        return true
+    }
+}
 ```
 
-## Author
+------------------------------------------------------------------------
 
-129182619, jitendrakumar.mobikul178@webkul.in
+## 🧪 Examples
 
-## License
+Check the `Examples/` directory for a demo iOS application showcasing
+usage of the bridge components.
 
-MyCustomPod is available under the MIT license. See the LICENSE file for more info.
+------------------------------------------------------------------------
+
+## 🆘 Need Help?
+
+Open an issue or start a discussion in the repository if you need help.
+
+------------------------------------------------------------------------
+
+## 📄 License
+
+MIT License
+
+------------------------------------------------------------------------
+
+## 📌 About
+
+BagistoNative_iOS\
+Native iOS bridge components for Hotwire Native applications.
