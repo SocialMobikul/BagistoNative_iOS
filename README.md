@@ -99,7 +99,7 @@ import UIKit
 
 // MARK: - App Configuration
 struct AppConfig {
-    static var baseURL: URL = URL(string: "http://192.168.15.171:3000/")!
+    static var baseURL: URL = URL(string: "base_url")!
 }
 
 // MARK: - Navigator Setup
