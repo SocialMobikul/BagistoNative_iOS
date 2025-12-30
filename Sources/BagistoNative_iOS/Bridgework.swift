@@ -5,7 +5,6 @@ public enum Bridgework {}
 
 public extension Bridgework {
     static let coreComponents = [
-        CartLoad.self,
         AlertComponent.self,
         NavButtonComponent.self,
         ImageSearchComponent.self,

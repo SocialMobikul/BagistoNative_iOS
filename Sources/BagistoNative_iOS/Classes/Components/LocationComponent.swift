@@ -17,7 +17,6 @@ final class LocationComponent: BridgeComponent {
         case .addLocationButton:
             locationController?.start()
             let action1 = UIAction { [weak self] _ in
-               print("rethgdfg")
                 self?.reply(
                     to: message.event,
                     with: [

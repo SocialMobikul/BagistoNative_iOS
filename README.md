@@ -12,6 +12,8 @@ web.
 This library contains reusable, real-world bridge components that can be
 easily plugged into any Hotwire Native iOS app.
 
+To find out more, visit: https://mobikul.com/
+
 ------------------------------------------------------------------------
 
 ## ✨ Features
@@ -30,19 +32,19 @@ The following bridge components are included:
 
 -   Alert
 -   Barcode Scanner
--   Biometrics Lock
 -   Button
--   Document Scanner
 -   Form
 -   Haptic Feedback
 -   Location
--   Menu
--   Permissions
 -   Review Prompt
 -   Search
 -   Share
 -   Theme
 -   Toast
+-   Download
+-   Image Search
+-   Navigation Stack
+ 
 
 ------------------------------------------------------------------------
 
@@ -88,6 +90,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 ```
+### Configuration Example
+
+You can configure your starting URL and navigator in your SceneDelegate:
+
+import HotwireNative
+import UIKit
+
+// MARK: - App Configuration
+struct AppConfig {
+    static var baseURL: URL = URL(string: "http://192.168.15.171:3000/")!
+}
+
+// MARK: - Navigator Setup
+var navigator: Navigator? = {
+    let config = Navigator.Configuration(name: "main", startLocation: AppConfig.baseURL)
+    return Navigator(configuration: config)
+}()
+
+// MARK: - Scene Delegate
+class SceneDelegate: UIResponder, UIWindowSceneDelegate, WKNavigationDelegate {
+    
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, 
+               willConnectTo session: UISceneSession, 
+               options connectionOptions: UIScene.ConnectionOptions) {
+        
+        guard let windowScene = scene as? UIWindowScene else { return }
+
+        window = UIWindow(windowScene: windowScene)
+        window?.rootViewController = navigator?.rootViewController
+        window?.makeKeyAndVisible()
+
+        navigator?.start()
+    }
+}
 
 ------------------------------------------------------------------------
 

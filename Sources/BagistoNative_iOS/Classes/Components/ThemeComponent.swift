@@ -18,9 +18,9 @@ class ThemeComponent: BridgeComponent {
                             print(json)
                             if let mode = json["mode"] as? String {
                                  if mode == ("dark") {
-                                    self.window?.overrideUserInterfaceStyle = .light
-                                 } else if  mode == ("light") {
                                      self.window?.overrideUserInterfaceStyle = .dark
+                                 } else if  mode == ("light") {
+                                     self.window?.overrideUserInterfaceStyle = .light
                                 }
                             }
                         }

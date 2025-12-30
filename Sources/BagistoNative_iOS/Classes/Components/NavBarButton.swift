@@ -22,7 +22,6 @@ final class NavButtonComponent: BridgeComponent {
                             guard let url = URL(string: url ?? "") else { return }
                             self?.visit(url)
                         }
-                        print("segsfgfgv");
                         let item = UIBarButtonItem(
                             title: "",
                             image: UIImage(systemName: "cart"),

@@ -27,11 +27,6 @@ final class ButtonComponent: BridgeComponent {
         let item = UIBarButtonItem(title: data.title, image: image, primaryAction: action)
         viewController?.navigationItem.rightBarButtonItem = item
     }
-    
-    
-    
-
-
 }
 
 private extension ButtonComponent {
