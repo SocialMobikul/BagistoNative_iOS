@@ -5,8 +5,8 @@ bridge components** that enable seamless communication between **Swift
 code and web views** in hybrid iOS applications.
 
 Bridge components allow your app to break out of the web view container
-and drive **native iOS features** such as scanners, permissions,
-haptics, and more --- while still keeping the majority of your UI on the
+and drive **native iOS features** such as scanners, ml search,
+download, review and more --- while still keeping the majority of your UI on the
 web.
 
 This library contains reusable, real-world bridge components that can be
@@ -93,7 +93,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 ### Configuration Example
 
 You can configure your starting URL and navigator in your SceneDelegate:
-
+``` swift
 import HotwireNative
 import UIKit
 
@@ -126,7 +126,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, WKNavigationDelegate {
         navigator?.start()
     }
 }
-
+```
 ------------------------------------------------------------------------
 
 ## 🧪 Examples
