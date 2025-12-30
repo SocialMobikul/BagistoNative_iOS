@@ -1,0 +1,4 @@
+module BagistoNative_iOS {
+    header "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/BagistoNative_iOS.build/BagistoNative_iOS-Swift.h"
+    requires objc
+}

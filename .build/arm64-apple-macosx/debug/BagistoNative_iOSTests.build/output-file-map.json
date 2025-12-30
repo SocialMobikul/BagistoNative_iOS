@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/BagistoNative_iOSTests.build/master.swiftdeps"
+  },
+  "/Users/jitendra/Documents/hotwirepod/MyCustomPod/Tests/BagistoNative_iOSTests/MyCustomPodTests.swift": {
+    "dependencies": "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/BagistoNative_iOSTests.build/MyCustomPodTests.d",
+    "object": "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/BagistoNative_iOSTests.build/MyCustomPodTests.swift.o",
+    "swiftmodule": "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/BagistoNative_iOSTests.build/MyCustomPodTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/BagistoNative_iOSTests.build/MyCustomPodTests.swiftdeps"
+  }
+}

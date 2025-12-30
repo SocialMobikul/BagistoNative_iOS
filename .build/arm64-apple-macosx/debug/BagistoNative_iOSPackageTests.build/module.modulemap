@@ -1,0 +1,4 @@
+module BagistoNative_iOSPackageTests {
+    header "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/BagistoNative_iOSPackageTests.build/BagistoNative_iOSPackageTests-Swift.h"
+    requires objc
+}

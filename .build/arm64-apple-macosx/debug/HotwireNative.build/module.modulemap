@@ -1,0 +1,4 @@
+module HotwireNative {
+    header "/Users/jitendra/Documents/hotwirepod/MyCustomPod/.build/arm64-apple-macosx/debug/HotwireNative.build/HotwireNative-Swift.h"
+    requires objc
+}
