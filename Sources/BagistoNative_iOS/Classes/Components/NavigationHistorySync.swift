@@ -55,7 +55,12 @@ final class NavigationHistoryComponent: BridgeComponent {
         }
 
         let action = UIAction { [weak webView] _ in
-            webView?.goBack()
+            if((webView?.canGoBack ?? false)) {
+                webView?.goBack()
+            } else {
+                self.hideBackButton()
+            }
+           
         }
 
         let item = UIBarButtonItem(
@@ -87,7 +92,7 @@ private extension NavigationHistoryComponent {
 
 // MARK: - UIView WKWebView Finder (Recursive)
 
-private extension UIView {
+ extension UIView {
     func findWKWebView() -> WKWebView? {
         if let webView = self as? WKWebView {
             return webView

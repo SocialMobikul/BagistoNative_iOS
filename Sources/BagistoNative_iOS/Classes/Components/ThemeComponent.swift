@@ -28,11 +28,7 @@ class ThemeComponent: BridgeComponent {
                         print("JSON parsing error: \(error)")
                     }
                 }
-
-                
-             
         }
- 
 }
 
 private extension ThemeComponent {

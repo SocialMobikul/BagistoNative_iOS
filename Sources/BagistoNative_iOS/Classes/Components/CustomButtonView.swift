@@ -1,6 +1,8 @@
 import HotwireNative
+import WebKit
 import UIKit
 
+var homeCehck = 0
 
 // MARK: - CustomButtonView
 
@@ -47,8 +49,9 @@ final class CustomButtonView: BridgeComponent {
 
         switch event {
         case .connect, .home:
+            viewController?.navigationItem.hidesBackButton = true
             addHomeButton(via: message)
-
+            addHomeButton(via: message)
         case .product:
             addProductButton(via: message)
 
@@ -59,8 +62,17 @@ final class CustomButtonView: BridgeComponent {
             viewController?.navigationItem.hidesBackButton = true
             print("")
             
+        case .modalopen:
+            viewController?.navigationItem.hidesBackButton = true
+            print("")
+            showCrossButtonIfNeeded(via: message)
+            
+        case .modaldismiss:
+            viewController?.navigationItem.hidesBackButton = true
+            print("")
+            showBackButtonIfNeeded()
+            
         case .cartcount:
-                        
             let jsonString = message.jsonData
             if let data = jsonString.data(using: .utf8) {
                 do {
@@ -86,7 +98,65 @@ final class CustomButtonView: BridgeComponent {
             NotificationCenter.default.removeObserver(observer)
         }
     }
+    
+    private var wkWebView: WKWebView? {
+        viewController?.view.findWKWebView()
+    }
+    
+    private func showBackButtonIfNeeded() {
+        guard let webView = wkWebView, webView.canGoBack else {
+            hideBackButton()
+            return
+        }
+
+        let action = UIAction { [weak webView] _ in
+            if((webView?.canGoBack ?? false)) {
+                webView?.goBack()
+            } else {
+                self.hideBackButton()
+            }
+           
+        }
+
+        let item = UIBarButtonItem(
+            image: UIImage(systemName: "chevron.left"),
+            primaryAction: action
+        )
+
+        viewController?.navigationItem.leftBarButtonItem = item
+    }
+    
+    private func showCrossButtonIfNeeded(via message: Message) {
+        if let webView = wkWebView {
+            hideBackButton()
+            let action = UIAction { [weak webView] _ in
+                if((webView?.canGoBack ?? false)) {
+                    self.showBackButtonIfNeeded()
+                } else {
+                    self.hideBackButton()
+                }
+                self.reply(to: message.event, with: ["type": "modal_dismiss"])
+            }
+
+            let item = UIBarButtonItem(
+                image: UIImage(systemName: "xmark"),
+                primaryAction: action
+            )
+
+            viewController?.navigationItem.leftBarButtonItem = item
+        }
+       
+    }
+
+    private func hideBackButton() {
+        viewController?.navigationItem.leftBarButtonItem = nil
+    }
 }
+
+// MARK: - WKWebView Finder
+
+
+
 
 // MARK: - UI Setup (ONLY ONCE)
 
@@ -356,18 +426,30 @@ private extension CustomButtonView {
         _ message: Message,
         _ controller: UIViewController
     ) {
-        let vc = MLImageSearchViewController()   // ✅ No storyboard
+        let vc = MLImageSearchViewController()
+        vc.searchType = type
+        vc.callBack = { [weak self] result in
+            self?.reply(
+                to: message.event,
+                with: ["type": "scan", "code": result]
+            )
+        }
 
-           vc.searchType = type
-           vc.callBack = { [weak self] result in
-               self?.reply(
-                   to: message.event,
-                   with: ["type": "scan", "code": result]
-               )
-           }
+        vc.modalPresentationStyle = .popover
 
-           vc.modalPresentationStyle = .fullScreen
-           controller.present(vc, animated: true)
+        if let popover = vc.popoverPresentationController {
+            popover.sourceView = controller.view
+            popover.sourceRect = CGRect(
+                x: controller.view.bounds.midX,
+                y: controller.view.bounds.midY,
+                width: 0,
+                height: 0
+            )
+            popover.permittedArrowDirections = []
+        }
+
+        controller.present(vc, animated: true)
+
     }
 }
 
@@ -382,6 +464,8 @@ private extension CustomButtonView {
         case account
         case navigationbackhide
         case cartcount
+        case modalopen
+        case modaldismiss
     }
 
     struct MessageData: Decodable {
