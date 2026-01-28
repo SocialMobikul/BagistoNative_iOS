@@ -1,16 +1,24 @@
-
 import UIKit
 import AVFoundation
 
+/// A view controller that manages the camera session for scanning barcodes and QR codes.
 final class BarcodeScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     
+    // MARK: - Callbacks
+    
+    /// Closure called when a barcode/QR code is successfully scanned.
     var onScanComplete: ((String) -> Void)?
+    
+    // MARK: - Properties
     
     private var captureSession: AVCaptureSession!
     private var previewLayer: AVCaptureVideoPreviewLayer!
     
+    /// Dedicated queue for camera session operations to avoid blocking the main thread.
     private let cameraQueue = DispatchQueue(label: "camera.session.queue")
 
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -40,6 +48,7 @@ final class BarcodeScannerViewController: UIViewController, AVCaptureMetadataOut
 
             self.captureSession.addOutput(metadataOutput)
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            // Supported metadata types for scanning
             metadataOutput.metadataObjectTypes = [.ean13, .qr, .code128, .upce]
 
             self.captureSession.commitConfiguration()
@@ -51,13 +60,22 @@ final class BarcodeScannerViewController: UIViewController, AVCaptureMetadataOut
                 self.view.layer.addSublayer(self.previewLayer)
             }
 
-            // ✅ Start capture session on background queue
+            // Start capture session on background queue
             self.captureSession.startRunning()
         }
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if captureSession?.isRunning == true {
+            captureSession.stopRunning()
+        }
+    }
     
-    func failed() {
+    // MARK: - Private Methods
+
+    /// Handles failure to initialize the camera or capture session.
+    private func failed() {
         let alert = UIAlertController(title: "Scanning Not Supported", message: "Your device does not support scanning.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
             self.dismiss(animated: true)
@@ -66,13 +84,9 @@ final class BarcodeScannerViewController: UIViewController, AVCaptureMetadataOut
         captureSession = nil
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if captureSession?.isRunning == true {
-            captureSession.stopRunning()
-        }
-    }
-    
+    // MARK: - AVCaptureMetadataOutputObjectsDelegate
+
+    /// Called when the camera detects a metadata object (e.g., barcode).
     func metadataOutput(_ output: AVCaptureMetadataOutput,
                         didOutput metadataObjects: [AVMetadataObject],
                         from connection: AVCaptureConnection) {
@@ -81,6 +95,7 @@ final class BarcodeScannerViewController: UIViewController, AVCaptureMetadataOut
         if let metadataObject = metadataObjects.first,
            let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject,
            let stringValue = readableObject.stringValue {
+            // Provide haptic feedback on success
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
             onScanComplete?(stringValue)
         } else {
@@ -88,6 +103,8 @@ final class BarcodeScannerViewController: UIViewController, AVCaptureMetadataOut
         }
     }
     
+    // MARK: - UI Configuration
+
     override var prefersStatusBarHidden: Bool { true }
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .portrait }
 }

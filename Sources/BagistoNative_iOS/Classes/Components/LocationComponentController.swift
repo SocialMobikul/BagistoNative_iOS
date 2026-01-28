@@ -1,104 +1,25 @@
-////
-////  LocationComponentController.swift
-////  Demo
-////
-////  Created by rishabh on 16/07/25.
-////
-//
-//import Foundation
-//import CoreLocation
-//
-//final class LocationManagerController: NSObject, CLLocationManagerDelegate {
-//    private let locationManager = CLLocationManager()
-//    private let completion: (Result<CLLocation, Error>) -> Void
-//    var didComplete: Bool = false
-//
-//    init(completion: @escaping (Result<CLLocation, Error>) -> Void) {
-//        self.completion = completion
-//        super.init()
-//        locationManager.delegate = self
-//        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-//        start()
-//    }
-//
-//    func start() {
-//        let status = CLLocationManager.authorizationStatus()
-//
-//        switch status {
-//        case .notDetermined:
-//            locationManager.requestWhenInUseAuthorization()
-//        case .authorizedWhenInUse, .authorizedAlways:
-//            locationManager.requestLocation()
-//        case .denied, .restricted:
-//            completion(.failure(LocationError.permissionDenied))
-//        @unknown default:
-//            completion(.failure(LocationError.unknown))
-//        }
-//    }
-//
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        if let location = locations.first {
-//            guard !didComplete else { return }
-//            didComplete = true
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                        self.completion(.success(location))
-//                    }
-//        } else {
-//            completion(.failure(LocationError.noLocation))
-//        }
-//    }
-//
-//    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-//        completion(.failure(error))
-//    }
-//
-//    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-//        let status = manager.authorizationStatus
-//        if status == .authorizedWhenInUse || status == .authorizedAlways {
-//            manager.requestLocation()
-//        } else if status == .denied || status == .restricted {
-//            completion(.failure(LocationError.permissionDenied))
-//        }
-//    }
-//
-//    enum LocationError: LocalizedError {
-//        case permissionDenied
-//        case noLocation
-//        case unknown
-//
-//        var errorDescription: String? {
-//            switch self {
-//            case .permissionDenied: return "Location permission denied"
-//            case .noLocation: return "Failed to retrieve location"
-//            case .unknown: return "Unknown location error"
-//            }
-//        }
-//    }
-//}
-//
-//
-//
-//
-//
-//  LocationManagerController.swift
-//  Demo
-//
-//  Created by rishabh on 16/07/25.
-//
-
 import Foundation
 import CoreLocation
 
+/// A helper class that manages the process of requesting the user's current location.
+/// It handles authorization state changes and ensures a single completion call.
 final class LocationManagerController: NSObject {
 
     // MARK: - Properties
 
+    /// The system's location manager.
     private let locationManager = CLLocationManager()
+    
+    /// The completion closure to call when the location is found or an error occurs.
     private let completion: (Result<CLLocation, Error>) -> Void
+    
+    /// A flag to ensure the completion closure is only called once.
     private var didComplete = false
 
     // MARK: - Init
 
+    /// Initializes a new location manager controller.
+    /// - Parameter completion: The closure to call with the location result.
     init(completion: @escaping (Result<CLLocation, Error>) -> Void) {
         self.completion = completion
         super.init()
@@ -111,19 +32,25 @@ final class LocationManagerController: NSObject {
 
     // MARK: - Start Flow
 
+    /// Begins the location request flow, checking for authorization first.
      func start() {
         handleAuthorization(locationManager.authorizationStatus)
     }
 
+    /// Handles different `CLAuthorizationStatus` states.
+    /// - Parameter status: The current authorization status.
     private func handleAuthorization(_ status: CLAuthorizationStatus) {
         switch status {
         case .notDetermined:
+            // Request permission if not yet determined
             locationManager.requestWhenInUseAuthorization()
 
         case .authorizedWhenInUse, .authorizedAlways:
+            // Request the current location if authorized
             locationManager.requestLocation()
 
         case .denied, .restricted:
+            // Inform about permission denial
             completeOnce(.failure(LocationError.permissionDenied))
 
         @unknown default:
@@ -133,6 +60,8 @@ final class LocationManagerController: NSObject {
 
     // MARK: - Completion Safety
 
+    /// Ensures the completion closure is called exactly once on the main thread.
+    /// - Parameter result: The location result or error.
     private func completeOnce(_ result: Result<CLLocation, Error>) {
         guard !didComplete else { return }
         didComplete = true
@@ -147,10 +76,12 @@ final class LocationManagerController: NSObject {
 
 extension LocationManagerController: CLLocationManagerDelegate {
 
+    /// Called when the authorization status changes.
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         handleAuthorization(manager.authorizationStatus)
     }
 
+    /// Called when new locations are available.
     func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation]) {
 
@@ -162,6 +93,7 @@ extension LocationManagerController: CLLocationManagerDelegate {
         completeOnce(.success(location))
     }
 
+    /// Called when the location manager fails to retrieve a location.
     func locationManager(_ manager: CLLocationManager,
                          didFailWithError error: Error) {
         completeOnce(.failure(error))
@@ -171,10 +103,13 @@ extension LocationManagerController: CLLocationManagerDelegate {
 // MARK: - Errors
 
 extension LocationManagerController {
-
+    /// Custom error types for the LocationManagerController.
     enum LocationError: LocalizedError {
+        /// The user denied location permissions.
         case permissionDenied
+        /// No location data could be retrieved.
         case noLocation
+        /// An unknown error occurred.
         case unknown
 
         var errorDescription: String? {

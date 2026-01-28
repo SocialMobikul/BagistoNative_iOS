@@ -2,37 +2,49 @@ import HotwireNative
 import WebKit
 import UIKit
 
-var homeCehck = 0
-
 // MARK: - CustomButtonView
 
+/// A versatile bridge component that dynamically manages navigation bar buttons,
+/// including cart badges, search/scan actions, and theme switching.
 final class CustomButtonView: BridgeComponent {
 
+    /// The name of the bridge component used to register with the web view.
     override class var name: String { "dynamicbutton" }
 
     // MARK: - Properties
 
+    /// Stores the last received cart-related message to facilitate replies upon button taps.
     private var lastCartMessage: Message?
+    /// Observer for cart-related notifications (if applicable).
     private var cartObserver: NSObjectProtocol?
 
+    /// Container view for the custom cart button and its badge.
     private let container = UIView(frame: CGRect(x: 0, y: 0, width: 44, height: 30))
+    /// The actual button for the cart action.
     private let buttonCart = UIButton(type: .custom)
+    /// Label displaying the number of items in the cart.
     private let badgeLabel = UILabel()
+    /// Local cache of the cart count.
     private var cartcountValue = 0
+    /// Flags to ensure one-time UI and observer configuration.
     private var isUIConfigured = false
     private var isObserverConfigured = false
 
+    /// Accessor for the current window scene's window.
     private var window: UIWindow? {
         let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
         return scene?.windows.first
     }
 
+    /// The view controller associated with this bridge component's destination.
     private var viewController: UIViewController? {
         delegate?.destination as? UIViewController
     }
 
     // MARK: - Hotwire Entry Point
 
+    /// Called when a message is received from the web side.
+    /// - Parameter message: The message object containing the event and data.
     override func onReceive(message: Message) {
 
         // 🔑 One-time setup (Hotwire safe)
@@ -99,10 +111,12 @@ final class CustomButtonView: BridgeComponent {
         }
     }
     
+    /// Finds the `WKWebView` within the view controller's hierarchy.
     private var wkWebView: WKWebView? {
         viewController?.view.findWKWebView()
     }
     
+    /// Configures and shows a "back" button in the navigation bar if the web view can go back.
     private func showBackButtonIfNeeded() {
         guard let webView = wkWebView, webView.canGoBack else {
             hideBackButton()
@@ -126,6 +140,8 @@ final class CustomButtonView: BridgeComponent {
         viewController?.navigationItem.leftBarButtonItem = item
     }
     
+    /// Replaces the back button with a "cross" (dismiss) button, typically for modals.
+    /// - Parameter message: The message that triggered the cross button.
     private func showCrossButtonIfNeeded(via message: Message) {
         if let webView = wkWebView {
             hideBackButton()
@@ -135,6 +151,7 @@ final class CustomButtonView: BridgeComponent {
                 } else {
                     self.hideBackButton()
                 }
+                // Notify the web side that the modal was dismissed
                 self.reply(to: message.event, with: ["type": "modal_dismiss"])
             }
 
@@ -148,6 +165,7 @@ final class CustomButtonView: BridgeComponent {
        
     }
 
+    /// Removes the left bar button item (the back button).
     private func hideBackButton() {
         viewController?.navigationItem.leftBarButtonItem = nil
     }
@@ -158,22 +176,23 @@ final class CustomButtonView: BridgeComponent {
 
 
 
-// MARK: - UI Setup (ONLY ONCE)
+// MARK: - UI Setup (Lazy initialization)
 
 private extension CustomButtonView {
 
+    /// Sets up the cart button and badge label once.
     func configureCartUIIfNeeded() {
         guard !isUIConfigured else { return }
         isUIConfigured = true
 
-        // Cart Button
+        // Cart Button styling
         let image = UIImage(systemName: "cart")?.withRenderingMode(.alwaysTemplate)
         buttonCart.setImage(image, for: .normal)
         buttonCart.tintColor = .systemBlue
         buttonCart.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
         buttonCart.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
 
-        // Badge Label
+        // Badge Label styling
         badgeLabel.textColor = .white
         badgeLabel.backgroundColor = .systemRed
         badgeLabel.font = .systemFont(ofSize: 12, weight: .bold)
@@ -195,6 +214,8 @@ private extension CustomButtonView {
 
 private extension CustomButtonView {
 
+    /// Updates the badge appearance and visibility based on the count.
+    /// - Parameter count: The number of items to display in the badge.
     func updateBadge(count: Int) {
         guard count > 0 else {
             badgeLabel.isHidden = true
@@ -227,12 +248,16 @@ private extension CustomButtonView {
 
 private extension CustomButtonView {
 
+    /// Creates a `UIBarButtonItem` containing the custom cart button and badge.
+    /// - Returns: A bar button item with the container as its custom view.
     func cartBarButtonItem() -> UIBarButtonItem {
         
         updateBadge(count: cartcountValue)
         return UIBarButtonItem(customView: container)
     }
 
+    /// Adds the "Home" context buttons to the navigation bar: Cart, QR Scan, and Barcode Scan.
+    /// - Parameter message: The message containing home configuration.
     func addHomeButton(via message: Message) {
         guard let _: MessageData = message.data() else { return }
         lastCartMessage = message
@@ -278,6 +303,8 @@ private extension CustomButtonView {
         ]
     }
 
+    /// Adds the "Product" context buttons to the navigation bar: Cart and Share.
+    /// - Parameter message: The message containing product configuration.
     func addProductButton(via message: Message) {
         guard let _: MessageData = message.data() else { return }
         lastCartMessage = message
@@ -316,6 +343,8 @@ private extension CustomButtonView {
         ]
     }
 
+    /// Adds the "Account" context buttons to the navigation bar: Theme Toggle.
+    /// - Parameter message: The message containing account configuration.
     func addAccountButton(via message: Message) {
         guard let _: MessageData = message.data() else { return }
 
@@ -347,11 +376,13 @@ private extension CustomButtonView {
 
 private extension CustomButtonView {
 
+    /// Action called when the cart button is tapped. Replies to the web side with "cart" type.
     @objc func buttonTapped() {
         guard let message = lastCartMessage else { return }
         reply(to: message.event, with: ["type": "cart"])
     }
 
+    /// Action called when the badge label is tapped. Replies to the web side with "cart" type.
     @objc func labelTapped() {
         guard let message = lastCartMessage else { return }
         reply(to: message.event, with: ["type": "cart"])
@@ -362,6 +393,8 @@ private extension CustomButtonView {
 
 private extension CustomButtonView {
 
+    /// Presents the system share sheet for the given URL.
+    /// - Parameter url: The URL to share.
     func share(_ url: URL) {
         let vc = UIActivityViewController(activityItems: [url], applicationActivities: nil)
 
@@ -379,6 +412,8 @@ private extension CustomButtonView {
         viewController?.present(vc, animated: true)
     }
 
+    /// Presents the custom barcode scanner.
+    /// - Parameter message: The message that triggered the scan action.
     func presentScanner(for message: Message) {
         guard let presenter = viewController else { return }
 
@@ -392,6 +427,8 @@ private extension CustomButtonView {
         presenter.present(scannerVC, animated: true)
     }
 
+    /// Presents an action sheet to choose between Object Detection and Text Recognition.
+    /// - Parameter message: The message that triggered the ML scan action.
     func presentMlScanner(for message: Message) {
         guard let presenter = viewController else { return }
 
@@ -421,6 +458,11 @@ private extension CustomButtonView {
         presenter.present(alert, animated: true)
     }
 
+    /// Presents the ML Image Search view controller.
+    /// - Parameters:
+    ///   - type: The type of search (image/object or text).
+    ///   - message: The message that triggered the ML search.
+    ///   - controller: The view controller to present from.
     func presentMLSearch(
         with type: MLSearchType,
         _ message: Message,

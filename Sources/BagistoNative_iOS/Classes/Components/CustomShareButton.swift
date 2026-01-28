@@ -1,171 +1,181 @@
 import HotwireNative
 import UIKit
 
-
+/// A bridge component that handles sharing URLs and managing cart buttons in the navigation bar.
+/// This component responds to the "share" name from the web side.
 final class MobikulShareButtonComponent: BridgeComponent {
 
-override class var name: String { "share" }
+    /// The name of the bridge component used to register with the web view.
+    override class var name: String { "share" }
 
-private var viewController: UIViewController? {
-delegate?.destination as? UIViewController
-}
+    // MARK: - Properties
 
-// MARK: - Receive messages
-override func onReceive(message: Message) {
-    print(message.jsonData)
-    let jsonString = message.jsonData // ✅ No optional unwrapping needed
-    if let data = jsonString.data(using: .utf8) {
-        do {
-            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                print(json)
+    /// The view controller that's currently displaying the bridge component's destination.
+    private var viewController: UIViewController? {
+        delegate?.destination as? UIViewController
+    }
 
-                let type = json["type"] as? String
-                let metadata = json["metadata"] as? [String: Any]
-                switch type {
-                           case "share":
-                    handleConnect(message: message)
-                           case "cart":
-                               handleClick(message: message)
+    // MARK: - BridgeComponent
 
-                           default:
-                               print("Unhandled type: \(type)")
-                           }
+    /// Called when a message is received from the web side.
+    /// Handles both "share" and "cart" types of interactions.
+    /// - Parameter message: The message object containing the event and data.
+    override func onReceive(message: Message) {
+        let jsonString = message.jsonData
+        if let data = jsonString.data(using: .utf8) {
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    let type = json["type"] as? String
+                    switch type {
+                    case "share":
+                        handleConnect(message: message)
+                    case "cart":
+                        handleClick(message: message)
+                    default:
+                        print("Unhandled type: \(type ?? "nil")")
+                    }
+                }
+            } catch {
+                print("JSON parsing error: \(error)")
             }
-        } catch {
-            print("JSON parsing error: \(error)")
+        }
+
+        // Validate event if needed for future use
+        guard let _ = Event(rawValue: message.event) else { return }
+    }
+
+    // MARK: - Message Handlers
+
+    /// Configures buttons in the navigation bar based on the "connect" logic.
+    /// - Parameter message: The message containing connection details.
+    private func handleConnect(message: Message) {
+        guard let data: MessageData = message.data() else { return }
+
+        switch data.type {
+        case "share":
+            addShareButton(url: data.url)
+        case "cart":
+            addCartButton(url: data.url)
+        default:
+            print("Unknown connect type: \(data.type ?? "nil")")
         }
     }
 
+    /// Handles click interactions, specifically for the cart button.
+    /// - Parameter message: The message containing click details.
+    private func handleClick(message: Message) {
+        guard let data: MessageData = message.data() else { return }
 
-guard let event = Event(rawValue: message.event) else {
-print("Unknown event: \(message.event)")
-return
-}
+        switch data.type {
+        case "cart":
+            let action = UIAction { [unowned self] _ in
+                // Inform the web side that the cart button was tapped
+                self.reply(to: message.event)
+            }
 
-}
-
-// MARK: - Handle connect
-private func handleConnect(message: Message) {
-guard let data: MessageData = message.data() else {
-print("Invalid data in connect")
-return
-}
-
-print("Handle connect type: \(data.type ?? "-"), url: \(data.url?.absoluteString ?? "-")")
-
-switch data.type {
-case "share":
-addShareButton(url: data.url)
-
-case "cart":
-addCartButton(url: data.url)
-
-default:
-print("Unknown connect type: \(data.type ?? "-")")
-}
-}
-
-// MARK: - Handle click
-private func handleClick(message: Message) {
-guard let data: MessageData = message.data() else {
-print("Invalid data in click")
-return
-}
-
-print("Handle click type: \(data.type ?? "-"), url: \(data.url?.absoluteString ?? "-")")
-
-switch data.type {
-case "cart":
-    let action = UIAction { [unowned self] _ in
-        self.reply(to: message.event)
+            let cartButton = UIBarButtonItem(
+                title: "",
+                image: UIImage(systemName: "cart"),
+                primaryAction: action
+            )
+            addNavItem(cartButton)
+        default:
+            print("Unknown click type: \(data.type ?? "nil")")
+        }
     }
 
-    let shareButton = UIBarButtonItem(
-    title: "sergt",
-    image: UIImage(systemName: "cart"),
-    primaryAction: action
-    )
-    addNavItem(shareButton)
+    // MARK: - Navigation Bar Management
 
-default:
-print("Unknown click type: \(data.type ?? "-")")
-}
-}
+    /// Adds a share button to the navigation bar.
+    /// - Parameter url: The URL to be shared.
+    private func addShareButton(url: URL?) {
+        guard let url else { return }
 
-// MARK: - Add nav bar buttons
-private func addShareButton(url: URL?) {
-guard let url else { return }
+        let action = UIAction { [unowned self] _ in
+            self.share(url)
+        }
 
-let action = UIAction { [unowned self] _ in
-share(url)
-}
+        let shareButton = UIBarButtonItem(
+            title: "Share",
+            image: UIImage(systemName: "square.and.arrow.up"),
+            primaryAction: action
+        )
 
-let shareButton = UIBarButtonItem(
-title: "Share",
-image: UIImage(systemName: "square.and.arrow.up"),
-primaryAction: action
-)
+        addNavItem(shareButton)
+    }
 
-addNavItem(shareButton)
-}
+    /// Adds a cart button to the navigation bar.
+    /// - Parameter url: The URL to navigate to when the cart button is tapped (optional).
+    private func addCartButton(url: URL?) {
+        let action = UIAction { [unowned self] _ in
+            self.openCart(url)
+        }
 
-private func addCartButton(url: URL?) {
-let action = UIAction { [unowned self] _ in
-openCart(url)
-}
+        let cartButton = UIBarButtonItem(
+            title: "Cart",
+            image: UIImage(systemName: "cart"),
+            primaryAction: action
+        )
 
-let cartButton = UIBarButtonItem(
-title: "Cart",
-image: UIImage(systemName: "cart"),
-primaryAction: action
-)
+        addNavItem(cartButton)
+    }
 
-addNavItem(cartButton)
-}
+    /// Appends a new bar button item to the right side of the navigation bar.
+    /// - Parameter item: The item to add.
+    private func addNavItem(_ item: UIBarButtonItem) {
+        var items = viewController?.navigationItem.rightBarButtonItems ?? []
+        items.append(item)
+        viewController?.navigationItem.rightBarButtonItems = items
+    }
 
-private func addNavItem(_ item: UIBarButtonItem) {
-var items = viewController?.navigationItem.rightBarButtonItems ?? []
-items.append(item)
-viewController?.navigationItem.rightBarButtonItems = items
-}
+    // MARK: - Actions
 
-// MARK: - Actions
-private func share(_ url: URL) {
-let activityViewController = UIActivityViewController(
-activityItems: [url],
-applicationActivities: nil
-)
-viewController?.present(activityViewController, animated: true)
-}
+    /// Displays the system share sheet.
+    /// - Parameter url: The URL to share.
+    private func share(_ url: URL) {
+        let activityViewController = UIActivityViewController(
+            activityItems: [url],
+            applicationActivities: nil
+        )
+        viewController?.present(activityViewController, animated: true)
+    }
 
-private func openCart(_ url: URL?) {
-guard let url else { return }
-print("Open Cart URL: \(url)")
-UIApplication.shared.open(url)
-}
+    /// Opens the cart URL in the system browser or app.
+    /// - Parameter url: The cart URL to open.
+    private func openCart(_ url: URL?) {
+        guard let url else { return }
+        UIApplication.shared.open(url)
+    }
 }
 
 // MARK: - Events
 
 extension MobikulShareButtonComponent {
-enum Event: String {
-case connect
-case click
-}
+    /// Events that this component can handle.
+    enum Event: String {
+        /// Initial connection/setup of buttons.
+        case connect
+        /// Handling click interactions.
+        case click
+    }
 }
 
-// MARK: - Message data
+// MARK: - Message Data
 
+/// Data structure for messages received by the Share component.
 struct MessageData: Decodable {
-let urlString: String
-let type: String?
+    /// The URL associated with the action.
+    let urlString: String
+    /// The type of item (share, cart, etc.).
+    let type: String?
 
-var url: URL? {
-URL(string: urlString)
-}
+    /// Converts the string URL to a `URL` object.
+    var url: URL? {
+        URL(string: urlString)
+    }
 
-enum CodingKeys: String, CodingKey {
-case urlString = "url"
-case type
-}
+    enum CodingKeys: String, CodingKey {
+        case urlString = "url"
+        case type
+    }
 }

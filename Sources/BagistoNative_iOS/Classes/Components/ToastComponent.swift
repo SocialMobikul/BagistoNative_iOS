@@ -1,14 +1,23 @@
-
 import HotwireNative
 import UIKit
 
+/// A bridge component that displays brief "toast" notification messages to the user.
+/// This component responds to the "toast" name from the web side.
 final class ToastComponent: BridgeComponent {
+    /// The name of the bridge component used to register with the web view.
     override class var name: String { "toast" }
 
+    // MARK: - Properties
+
+    /// The view controller that's currently displaying the bridge component's destination.
     private var viewController: UIViewController? {
         delegate?.destination as? UIViewController
     }
 
+    // MARK: - BridgeComponent
+
+    /// Called when a message is received from the web side.
+    /// - Parameter message: The message object containing the toast text.
     override func onReceive(message: Message) {
         guard let event = Event(rawValue: message.event) else { return }
 
@@ -18,6 +27,10 @@ final class ToastComponent: BridgeComponent {
         }
     }
 
+    // MARK: - Private Methods
+
+    /// Creates and animates a toast message label in the view controller's view.
+    /// - Parameter message: The message containing the text to display.
     private func showToast(via message: Message) {
         guard let data: MessageData = message.data(), let viewController else { return }
 
@@ -27,8 +40,11 @@ final class ToastComponent: BridgeComponent {
         animateToastInAndOut(toast)
     }
 
+    /// Creates a styled `UILabel` with padding for the toast.
+    /// - Parameter text: The message text.
+    /// - Returns: A configured `PaddingLabel`.
     private func makeLabel(text: String) -> UILabel {
-        let label = PaddingLabel(top: 8, left: 12, bottom: 8, right: 12) // ✅ Padding for better look
+        let label = PaddingLabel(top: 8, left: 12, bottom: 8, right: 12) 
         label.text = text
         label.textAlignment = .center
         label.backgroundColor = UIColor.black.withAlphaComponent(0.7)
@@ -40,12 +56,16 @@ final class ToastComponent: BridgeComponent {
         label.alpha = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         
-        // ✅ Dynamic height adjustment
+        // Ensure the label hugs its contents tightly
         label.setContentHuggingPriority(.required, for: .vertical)
         label.setContentCompressionResistancePriority(.required, for: .vertical)
         return label
     }
 
+    /// Constrains the toast label to the bottom center of the view.
+    /// - Parameters:
+    ///   - toast: The toast label to constrain.
+    ///   - view: The parent view.
     private func constrainToast(_ toast: UILabel, in view: UIView) {
         NSLayoutConstraint.activate([
             toast.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 16),
@@ -55,6 +75,8 @@ final class ToastComponent: BridgeComponent {
         ])
     }
 
+    /// Performs a fade-in / delay / fade-out animation sequence.
+    /// - Parameter toast: The toast label to animate.
     private func animateToastInAndOut(_ toast: UILabel) {
         UIView.animate(withDuration: 0.5, animations: {
             toast.alpha = 1
@@ -62,29 +84,39 @@ final class ToastComponent: BridgeComponent {
             UIView.animate(withDuration: 0.5, delay: 2, options: .curveEaseOut, animations: {
                 toast.alpha = 0
             }) { _ in
+                // Cleanup: remove the toast from the view hierarchy once finished
                 toast.removeFromSuperview()
             }
         }
     }
 }
 
-private extension ToastComponent {
-    enum Event: String {
-        case show
-    }
-}
+// MARK: - Events & Data Models
 
 private extension ToastComponent {
+    /// Events that this component can handle.
+    enum Event: String {
+        /// Displays the toast message.
+        case show
+    }
+
+    /// The data structure expected in the message from the web side.
     struct MessageData: Decodable {
+        /// The toast message text.
         let message: String
     }
 }
+
+// MARK: - UI Helpers
+
+/// A custom `UILabel` that allows for padding around its text.
 class PaddingLabel: UILabel {
     private var topInset: CGFloat
     private var leftInset: CGFloat
     private var bottomInset: CGFloat
     private var rightInset: CGFloat
 
+    /// Initializes a padding label with specified insets.
     init(top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat) {
         self.topInset = top
         self.leftInset = left
