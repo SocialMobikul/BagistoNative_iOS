@@ -66,23 +66,22 @@ final class CustomButtonView: BridgeComponent {
             addHomeButton(via: message)
         case .product:
             addProductButton(via: message)
-
         case .account:
             addAccountButton(via: message)
-
         case .navigationbackhide:
             viewController?.navigationItem.hidesBackButton = true
-            print("")
             
         case .modalopen:
             viewController?.navigationItem.hidesBackButton = true
-            print("")
             showCrossButtonIfNeeded(via: message)
             
         case .modaldismiss:
             viewController?.navigationItem.hidesBackButton = true
-            print("")
             showBackButtonIfNeeded()
+            
+        case .empty:
+            self.viewController?.navigationItem.rightBarButtonItems = nil
+            self.viewController?.navigationItem.searchController = nil
             
         case .cartcount:
             let jsonString = message.jsonData
@@ -508,6 +507,7 @@ private extension CustomButtonView {
         case cartcount
         case modalopen
         case modaldismiss
+        case empty
     }
 
     struct MessageData: Decodable {

@@ -48,6 +48,7 @@ final class NavigationHistoryComponent: BridgeComponent {
                let metadata = json["metadata"] as? [String: Any] {
 
                 let url = metadata["url"] as? String ?? ""
+                viewController?.navigationItem.title = json["title"] as? String ?? ""
 
                 // Update back button visibility based on URL presence and web view state
                 if !url.isEmpty {
