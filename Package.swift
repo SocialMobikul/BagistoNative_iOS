@@ -15,6 +15,8 @@ let package = Package(
             name: "BagistoNative_iOS",
             dependencies: [
                 .product(name: "HotwireNative", package: "hotwire-native-ios")
+            ],resources: [
+                .process("Resources")
             ]
         ),
         .testTarget(

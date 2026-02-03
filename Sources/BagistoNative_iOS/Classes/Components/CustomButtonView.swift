@@ -281,7 +281,7 @@ private extension CustomButtonView {
 
         let scanItem = UIBarButtonItem(
             title: "",
-            image: UIImage(systemName: "qrcode"),
+            image: UIImage(systemName: "barcode.viewfinder"),
             primaryAction: scanAction
         )
 
@@ -291,10 +291,10 @@ private extension CustomButtonView {
 
         let mlItem = UIBarButtonItem(
             title: "",
-            image: UIImage(systemName: "barcode.viewfinder"),
+            image: UIImage(systemName: "camera.viewfinder"),
             primaryAction: mlAction
         )
-
+        
         viewController?.navigationItem.rightBarButtonItems = [
             cartItem,
             scanItem,
