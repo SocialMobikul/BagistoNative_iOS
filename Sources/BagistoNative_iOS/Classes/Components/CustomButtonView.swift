@@ -430,31 +430,7 @@ private extension CustomButtonView {
     /// - Parameter message: The message that triggered the ML scan action.
     func presentMlScanner(for message: Message) {
         guard let presenter = viewController else { return }
-
-        let alert = UIAlertController(title: "Select Option", message: nil, preferredStyle: .actionSheet)
-
-        alert.addAction(UIAlertAction(title: "Detect Object", style: .default) { _ in
-            self.presentMLSearch(with: .image, message, presenter)
-        })
-
-        alert.addAction(UIAlertAction(title: "Read Text", style: .default) { _ in
-            self.presentMLSearch(with: .text, message, presenter)
-        })
-
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-
-        if let popover = alert.popoverPresentationController {
-            popover.sourceView = presenter.view
-            popover.sourceRect = CGRect(
-                x: presenter.view.bounds.midX,
-                y: presenter.view.bounds.midY,
-                width: 0,
-                height: 0
-            )
-            popover.permittedArrowDirections = []
-        }
-
-        presenter.present(alert, animated: true)
+        self.presentMLSearch(with: .image, message, presenter)
     }
 
     /// Presents the ML Image Search view controller.
