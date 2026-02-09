@@ -19,7 +19,7 @@ final class CustomButtonView: BridgeComponent {
     private var cartObserver: NSObjectProtocol?
 
     /// Container view for the custom cart button and its badge.
-    private let container = UIView(frame: CGRect(x: 0, y: 0, width: 44, height: 30))
+    private let container = UIView(frame: CGRect(x: 0, y: 0, width: 60, height: 44))
     /// The actual button for the cart action.
     private let buttonCart = UIButton(type: .custom)
     /// Label displaying the number of items in the cart.
@@ -188,7 +188,8 @@ private extension CustomButtonView {
         let image = UIImage(systemName: "cart")?.withRenderingMode(.alwaysTemplate)
         buttonCart.setImage(image, for: .normal)
         buttonCart.tintColor = .systemBlue
-        buttonCart.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        buttonCart.frame = CGRect(x: 0, y: 0, width: 60, height: 44)
+        buttonCart.contentHorizontalAlignment = .center
         buttonCart.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
 
         // Badge Label styling
@@ -232,8 +233,8 @@ private extension CustomButtonView {
         let badgeWidth = max(minWidth, textWidth)
 
         badgeLabel.frame = CGRect(
-            x: buttonCart.frame.maxX - badgeWidth / 2,
-            y: -6,
+            x: 35,
+            y: 0,
             width: badgeWidth,
             height: height
         )
