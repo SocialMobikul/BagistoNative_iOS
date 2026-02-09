@@ -1,14 +1,17 @@
 {
   "images" : [
     {
+      "filename" : "spash-640 × 1136.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "spash-1242 × 2208.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "spash-750 × 1334.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

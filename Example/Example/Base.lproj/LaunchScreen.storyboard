@@ -17,16 +17,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="w4T-HJ-051">
-                                <rect key="frame" x="0.0" y="59" width="393" height="759"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Splash" translatesAutoresizingMaskIntoConstraints="NO" id="w4T-HJ-051">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="w4T-HJ-051" secondAttribute="bottom" id="1zF-5Q-zC3"/>
+                            <constraint firstAttribute="bottom" secondItem="w4T-HJ-051" secondAttribute="bottom" id="1zF-5Q-zC3"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="w4T-HJ-051" secondAttribute="trailing" id="CB2-d1-DwJ"/>
-                            <constraint firstItem="w4T-HJ-051" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="gx0-bA-2gf"/>
+                            <constraint firstItem="w4T-HJ-051" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="gx0-bA-2gf"/>
                             <constraint firstItem="w4T-HJ-051" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="wTA-bc-Erp"/>
                         </constraints>
                     </view>
@@ -37,6 +37,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Splash" width="250" height="444.66665649414062"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
